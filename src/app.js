@@ -145,7 +145,7 @@ app.post(
   }
 );
 
-app.listen(PORT, (re, err) => {
+app.listen(4000, (re, err) => {
   if (err) console.log(err);
   console.log("running on http://localhost:4000");
   // db.sequelize.authenticate();
