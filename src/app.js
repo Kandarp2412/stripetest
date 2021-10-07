@@ -19,6 +19,10 @@ let updatedAt = Date.now();
 
 // db();
 
+app.get("/", async (req, res) => {
+  console.log("called");
+});
+
 const standeredAccount = async (email) => {
   try {
     const account = await stripe.accounts.create({
