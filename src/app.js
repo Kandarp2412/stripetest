@@ -14,6 +14,8 @@ const bodyParser = require("body-parser");
 app.use(express.json());
 app.use(cors());
 
+const PORT = process.env.PORT || 9002;
+
 let createdAt = Date.now();
 let updatedAt = Date.now();
 
@@ -143,7 +145,7 @@ app.post(
   }
 );
 
-app.listen(4000, (re, err) => {
+app.listen(PORT, (re, err) => {
   if (err) console.log(err);
   console.log("running on http://localhost:4000");
   // db.sequelize.authenticate();
