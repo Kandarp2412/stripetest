@@ -95,6 +95,50 @@ app.get(`/createAccount/:email`, async (req, res) => {
 // This is your Stripe CLI webhook secret for testing your endpoint locally.
 const endpointSecret = "whsec_58SS5ICwlvmk5boxy95umA0Daka1Aeur";
 
+app.post(
+  "/webhook",
+  bodyParser.raw({ type: "application/json" }),
+  async (request, response) => {
+    const payload = request.body;
+    const sig = request.headers["stripe-signature"];
+    const endpointSecret = "whsec_58SS5ICwlvmk5boxy95umA0Daka1Aeur";
+    let event;
+    try {
+      event = stripe.webhooks.constructEvent(payload, sig, endpointSecret);
+    } catch (err) {
+      console.log(err.message);
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    switch (event.type) {
+      case "account.updated":
+        const account = event.data.object;
+        let id = account.id;
+        let charges_enabled = account.charges_enabled;
+        let payouts_enabled = account.payouts_enabled;
+        let sql =
+          "UPDATE users SET charges = '" +
+          charges_enabled +
+          "', payouts = '" +
+          payouts_enabled +
+          "' WHERE userId='" +
+          id +
+          "'";
+        console.log(account);
+        // console.log(event.data);
+        const [userprofile, resultmeta] = await db.sequelize.query(sql);
+        // Then define and call a function to handle the event account.updated
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+    // Return a 200 response to acknowledge receipt of the event
+    response.send();
+  }
+);
+
 app.listen(4000, (re, err) => {
   if (err) console.log(err);
   console.log("running on http://localhost:4000");
